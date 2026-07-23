@@ -205,10 +205,10 @@ const saveWarnfrist = async () => {
   }
 }
 
-// Logic for Red Highlight
-const getRowClass = (row) => {
+// Logic for Red Highlight and Ordering
+const needsOrder = (row) => {
   if (row.tageVerbleibend <= warnfrist.value) {
-    return 'bg-red-2 text-red-10 text-weight-bold'
+    return true
   }
   
   const outDate = new Date()
@@ -218,11 +218,15 @@ const getRowClass = (row) => {
     const start = new Date(holiday.beginn)
     const end = new Date(holiday.ende)
     if (outDate >= start && outDate <= end) {
-      return 'bg-red-2 text-red-10 text-weight-bold'
+      return true
     }
   }
 
-  return ''
+  return false
+}
+
+const getRowClass = (row) => {
+  return needsOrder(row) ? 'bg-red-2 text-red-10 text-weight-bold' : ''
 }
 
 // Medikament Actions
@@ -288,7 +292,7 @@ const confirmDeleteMedikament = (row) => {
 }
 
 const copyNachbestellung = () => {
-  const toOrder = medikamente.value.filter(m => m.tageVerbleibend <= warnfrist.value)
+  const toOrder = medikamente.value.filter(needsOrder)
   if (toOrder.length === 0) {
     $q.notify({ type: 'info', message: 'Keine Medikamente zur Nachbestellung.' })
     return
@@ -300,6 +304,12 @@ const copyNachbestellung = () => {
   const textToCopy = 'Nachbestellungen:\n' + textLines.join('\n')
   
   copyToClipboard(textToCopy).then(() => {
+    $q.dialog({
+      title: 'In Zwischenablage kopiert',
+      message: `<pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">${textToCopy}</pre>`,
+      html: true,
+      ok: 'Schließen'
+    })
     $q.notify({ type: 'positive', message: 'Nachbestellungen in die Zwischenablage kopiert!' })
   }).catch(() => {
     $q.notify({ type: 'negative', message: 'Kopieren in die Zwischenablage fehlgeschlagen.' })
