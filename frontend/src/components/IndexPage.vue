@@ -1,13 +1,14 @@
 <template>
   <q-page padding class="q-gutter-y-lg">
-    <div class="row items-center q-gutter-x-md">
-      <q-space />
+    <div class="row items-center q-gutter-x-md q-pb-md">
       <q-input 
         v-model.number="warnfrist" 
         type="number" 
         label="Warnfrist (Tage)" 
-        filled
-        color="primary"
+        standout="bg-primary text-white"
+        bg-color="grey-3"
+        label-color="black"
+        color="black"
         dense
         style="max-width: 150px"
         @change="saveWarnfrist"
