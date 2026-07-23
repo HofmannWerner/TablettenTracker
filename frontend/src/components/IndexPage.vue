@@ -6,13 +6,14 @@
         v-model.number="warnfrist" 
         type="number" 
         label="Warnfrist (Tage)" 
-        outlined 
+        filled
+        color="primary"
         dense
         style="max-width: 150px"
         @change="saveWarnfrist"
       >
         <template v-slot:prepend>
-          <q-icon name="warning" color="warning" />
+          <q-icon name="warning" color="negative" />
         </template>
       </q-input>
     </div>
