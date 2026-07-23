@@ -22,6 +22,7 @@
       <q-card-section class="row items-center bg-primary text-white">
         <div class="text-h6">Medikamente</div>
         <q-space />
+        <q-btn flat color="white" icon="content_copy" label="Nachbestellungen kopieren" @click="copyNachbestellung()" class="q-mr-sm" />
         <q-btn color="white" text-color="primary" label="Neuanlegen" icon="add" @click="openMedikamentDialog()" />
       </q-card-section>
       
@@ -97,6 +98,16 @@
 
         <q-card-section class="q-pt-md q-gutter-y-md">
           <q-input v-model="medDialog.data.medikament" label="Medikament Name" outlined autofocus />
+          <q-select 
+            v-model="medDialog.data.zeiten" 
+            :options="['Morgens', 'Mittags', 'Nachmittags', 'Abends']" 
+            label="Einnahmezeiten" 
+            multiple 
+            outlined 
+            use-chips 
+            emit-value 
+            map-options 
+          />
           <q-input v-model="medDialog.data.startDatum" label="Start Datum" type="date" outlined />
           <q-input v-model="medDialog.data.aktuellesDatum" label="Aktuelles Datum" type="date" outlined />
           <q-input v-model.number="medDialog.data.anzahlTabletten" label="Anzahl Tabletten" type="number" outlined />
@@ -135,7 +146,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useQuasar } from 'quasar'
+import { useQuasar, copyToClipboard } from 'quasar'
 import { 
   GetMedikamente, CreateMedikament, UpdateMedikament, DeleteMedikament, 
   GetFerien, CreateFerien, UpdateFerien, DeleteFerien, 
@@ -150,6 +161,7 @@ const ferien = ref([])
 
 const medColumns = [
   { name: 'medikament', label: 'Medikament', field: 'medikament', align: 'left', sortable: true },
+  { name: 'zeiten', label: 'Zeiten', field: 'zeiten', align: 'left' },
   { name: 'startDatum', label: 'Startdatum', field: 'startDatum', align: 'left' },
   { name: 'aktuellesDatum', label: 'Aktuelles Datum', field: 'aktuellesDatum', align: 'left' },
   { name: 'anzahlTabletten', label: 'Anzahl Tabletten', field: 'anzahlTabletten', align: 'center' },
@@ -219,13 +231,24 @@ const openMedikamentDialog = (row = null) => {
     medDialog.value = { 
       show: true, 
       isEdit: true, 
-      data: { ...row, startDatum: row.startDatum.split('T')[0], aktuellesDatum: row.aktuellesDatum.split('T')[0] } 
+      data: { 
+        ...row, 
+        zeiten: row.zeiten ? row.zeiten.split(', ') : [],
+        startDatum: row.startDatum.split('T')[0], 
+        aktuellesDatum: row.aktuellesDatum.split('T')[0] 
+      } 
     }
   } else {
     medDialog.value = { 
       show: true, 
       isEdit: false, 
-      data: { startDatum: new Date().toISOString().split('T')[0], aktuellesDatum: new Date().toISOString().split('T')[0], anzahlTabletten: 0, einnahmeTag: 1.0 } 
+      data: { 
+        zeiten: [],
+        startDatum: new Date().toISOString().split('T')[0], 
+        aktuellesDatum: new Date().toISOString().split('T')[0], 
+        anzahlTabletten: 0, 
+        einnahmeTag: 1.0 
+      } 
     }
   }
 }
@@ -235,6 +258,7 @@ const saveMedikament = async () => {
     let m = { ...medDialog.value.data }
     m.anzahlTabletten = Number(m.anzahlTabletten)
     m.einnahmeTag = Number(m.einnahmeTag)
+    m.zeiten = m.zeiten && m.zeiten.length ? m.zeiten.join(', ') : ''
     m.startDatum = new Date(m.startDatum).toISOString()
     m.aktuellesDatum = new Date(m.aktuellesDatum).toISOString()
 
@@ -260,6 +284,25 @@ const confirmDeleteMedikament = (row) => {
   }).onOk(async () => {
     await DeleteMedikament(row.id)
     await loadData()
+  })
+}
+
+const copyNachbestellung = () => {
+  const toOrder = medikamente.value.filter(m => m.tageVerbleibend <= warnfrist.value)
+  if (toOrder.length === 0) {
+    $q.notify({ type: 'info', message: 'Keine Medikamente zur Nachbestellung.' })
+    return
+  }
+  const textLines = toOrder.map(m => {
+    const zeiten = m.zeiten ? ` (${m.zeiten})` : ''
+    return `- ${m.medikament}${zeiten}: Noch ${m.nochvorhanden} Stück vorhanden (${m.tageVerbleibend.toFixed(1)} Tage)`
+  })
+  const textToCopy = 'Nachbestellungen:\n' + textLines.join('\n')
+  
+  copyToClipboard(textToCopy).then(() => {
+    $q.notify({ type: 'positive', message: 'Nachbestellungen in die Zwischenablage kopiert!' })
+  }).catch(() => {
+    $q.notify({ type: 'negative', message: 'Kopieren in die Zwischenablage fehlgeschlagen.' })
   })
 }
 

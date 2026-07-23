@@ -47,6 +47,7 @@ export namespace main {
 	    aktuellesDatum: any;
 	    anzahlTabletten: number;
 	    einnahmeTag: number;
+	    zeiten: string;
 	    nochvorhanden: number;
 	    tageVerbleibend: number;
 	
@@ -62,6 +63,7 @@ export namespace main {
 	        this.aktuellesDatum = this.convertValues(source["aktuellesDatum"], null);
 	        this.anzahlTabletten = source["anzahlTabletten"];
 	        this.einnahmeTag = source["einnahmeTag"];
+	        this.zeiten = source["zeiten"];
 	        this.nochvorhanden = source["nochvorhanden"];
 	        this.tageVerbleibend = source["tageVerbleibend"];
 	    }

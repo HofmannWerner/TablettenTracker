@@ -55,7 +55,8 @@ func (a *App) createTables() {
 		start_datum DATETIME NOT NULL,
 		aktuelles_datum DATETIME,
 		anzahl_tabletten INTEGER NOT NULL,
-		einnahme_tag REAL NOT NULL
+		einnahme_tag REAL NOT NULL,
+		zeiten TEXT DEFAULT ''
 	);`
 
 	ferienTable := `
@@ -86,6 +87,9 @@ func (a *App) createTables() {
 
 	// Insert default Warnfrist if not exists
 	_, _ = a.db.Exec(`INSERT OR IGNORE INTO settings (key, value) VALUES ('warnfrist', 14)`)
+
+	// Upgrade existing database schema: add 'zeiten' column if it doesn't exist
+	_, _ = a.db.Exec(`ALTER TABLE medikamente ADD COLUMN zeiten TEXT DEFAULT ''`)
 }
 
 // ------------------------------------------
@@ -99,6 +103,7 @@ type Medikament struct {
 	AktuellesDatum  time.Time `json:"aktuellesDatum" db:"aktuelles_datum"`
 	AnzahlTabletten int       `json:"anzahlTabletten" db:"anzahl_tabletten"`
 	EinnahmeTag     float64   `json:"einnahmeTag" db:"einnahme_tag"`
+	Zeiten          string    `json:"zeiten" db:"zeiten"`
 	Nochvorhanden   int       `json:"nochvorhanden"`
 	TageVerbleibend float64   `json:"tageVerbleibend"`
 }
@@ -132,7 +137,7 @@ func (m *Medikament) calculateRemaining() {
 // ------------------------------------------
 
 func (a *App) GetMedikamente() []Medikament {
-	rows, err := a.db.Query("SELECT id, medikament, start_datum, aktuelles_datum, anzahl_tabletten, einnahme_tag FROM medikamente")
+	rows, err := a.db.Query("SELECT id, medikament, start_datum, aktuelles_datum, anzahl_tabletten, einnahme_tag, zeiten FROM medikamente")
 	if err != nil {
 		log.Println("GetMedikamente error:", err)
 		return []Medikament{}
@@ -142,9 +147,13 @@ func (a *App) GetMedikamente() []Medikament {
 	var meds []Medikament
 	for rows.Next() {
 		var m Medikament
-		if err := rows.Scan(&m.ID, &m.Medikament, &m.StartDatum, &m.AktuellesDatum, &m.AnzahlTabletten, &m.EinnahmeTag); err != nil {
+		var zeiten sql.NullString
+		if err := rows.Scan(&m.ID, &m.Medikament, &m.StartDatum, &m.AktuellesDatum, &m.AnzahlTabletten, &m.EinnahmeTag, &zeiten); err != nil {
 			log.Println("Scan error:", err)
 			continue
+		}
+		if zeiten.Valid {
+			m.Zeiten = zeiten.String
 		}
 		m.calculateRemaining()
 		meds = append(meds, m)
@@ -157,8 +166,8 @@ func (a *App) GetMedikamente() []Medikament {
 }
 
 func (a *App) CreateMedikament(m Medikament) Medikament {
-	res, err := a.db.Exec("INSERT INTO medikamente (medikament, start_datum, aktuelles_datum, anzahl_tabletten, einnahme_tag) VALUES (?, ?, ?, ?, ?)",
-		m.Medikament, m.StartDatum, m.AktuellesDatum, m.AnzahlTabletten, m.EinnahmeTag)
+	res, err := a.db.Exec("INSERT INTO medikamente (medikament, start_datum, aktuelles_datum, anzahl_tabletten, einnahme_tag, zeiten) VALUES (?, ?, ?, ?, ?, ?)",
+		m.Medikament, m.StartDatum, m.AktuellesDatum, m.AnzahlTabletten, m.EinnahmeTag, m.Zeiten)
 	if err != nil {
 		log.Println("CreateMedikament error:", err)
 		return m
@@ -171,8 +180,8 @@ func (a *App) CreateMedikament(m Medikament) Medikament {
 }
 
 func (a *App) UpdateMedikament(m Medikament) Medikament {
-	_, err := a.db.Exec("UPDATE medikamente SET medikament=?, start_datum=?, aktuelles_datum=?, anzahl_tabletten=?, einnahme_tag=? WHERE id=?",
-		m.Medikament, m.StartDatum, m.AktuellesDatum, m.AnzahlTabletten, m.EinnahmeTag, m.ID)
+	_, err := a.db.Exec("UPDATE medikamente SET medikament=?, start_datum=?, aktuelles_datum=?, anzahl_tabletten=?, einnahme_tag=?, zeiten=? WHERE id=?",
+		m.Medikament, m.StartDatum, m.AktuellesDatum, m.AnzahlTabletten, m.EinnahmeTag, m.Zeiten, m.ID)
 	if err != nil {
 		log.Println("UpdateMedikament error:", err)
 	}
