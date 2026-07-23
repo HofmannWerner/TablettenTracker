@@ -16,7 +16,7 @@ jobs:
           - os: windows-latest
             platform: windows/amd64
             name: TablettenTracker-Windows-amd64.exe
-            buildflags: ''
+            buildflags: '-tags native_webview2loader'
           - os: ubuntu-latest
             platform: linux/amd64
             name: TablettenTracker-Linux-amd64
