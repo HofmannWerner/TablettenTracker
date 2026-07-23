@@ -298,8 +298,7 @@ const copyNachbestellung = () => {
     return
   }
   const textLines = toOrder.map(m => {
-    const zeiten = m.zeiten ? ` (${m.zeiten})` : ''
-    return `- ${m.medikament}${zeiten}: Noch ${m.nochvorhanden} Stück vorhanden (${m.tageVerbleibend.toFixed(1)} Tage)`
+    return `- ${m.medikament}`
   })
   const textToCopy = 'Nachbestellungen:\n' + textLines.join('\n')
   
