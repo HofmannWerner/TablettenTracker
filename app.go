@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -29,7 +31,15 @@ func (a *App) startup(ctx context.Context) {
 
 func (a *App) initDB() {
 	var err error
-	a.db, err = sql.Open("sqlite", "tracker.db")
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		configDir = "."
+	}
+	appDir := filepath.Join(configDir, "TablettenTracker")
+	os.MkdirAll(appDir, 0755)
+
+	dbPath := filepath.Join(appDir, "tracker.db")
+	a.db, err = sql.Open("sqlite", dbPath)
 	if err != nil {
 		log.Fatalf("Error opening database: %v", err)
 	}
