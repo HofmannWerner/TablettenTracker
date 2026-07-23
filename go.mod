@@ -1,4 +1,4 @@
-module tmp
+module TablettenTracker
 
 go 1.25.0
 
