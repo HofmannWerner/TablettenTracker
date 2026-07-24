@@ -1,19 +1,30 @@
-# README
+# TablettenTracker 💊
 
-## About
+Eine moderne Cross-Platform Desktop-Anwendung zur Verwaltung von Medikamentenvorräten, Einnahmezeiten, Urlaubsterminen und Nachbestellungen.
 
-This is the official Wails Vue template.
+Built mit **Wails (Go + Vue 3 + Quasar)**.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+## 📖 Bedienungsanleitung & Funktionsbeschreibung
+Eine ausführliche Funktionsbeschreibung und Bedienungsanleitung für Nutzer finden Sie in:
+👉 **[BEDIENUNGSANLEITUNG.md](./BEDIENUNGSANLEITUNG.md)**
 
-## Live Development
+## 🌟 Features
+* 💊 **Medikamentenvorrats-Berechnung**: Automatische Tages- und Restbestandsberechnung.
+* ⚠️ **Intelligente Warnfrist**: Automatische rote Markierung bei knappem Vorrat oder Überschneidung mit Urlaubsterminen.
+* 📋 **Nachbestellungen kopieren**: Schnelles Kopieren der benötigten Medikamente in die Zwischenablage.
+* 🏖️ **Ferienverwaltung**: Eigenes Tab für Urlaubstermine.
+* 🌍 **Mehrsprachigkeit**: Deutsch 🇩🇪, Englisch 🇬🇧, Italienisch 🇮🇹 mit Flaggen-Umschalter.
+* 🌙 **Dark Mode**: Integrierter Hell-/Dunkelmodus.
+* 📦 **Multi-Plattform Builds**: Builds für Windows (`.exe`), macOS (`.dmg`) und Linux.
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+## 🛠️ Entwicklung
 
-## Building
+### Live Development
+```bash
+wails dev
+```
 
-To build a redistributable, production mode package, use `wails build`.
+### Build
+```bash
+wails build
+```

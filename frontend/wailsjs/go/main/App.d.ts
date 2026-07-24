@@ -16,6 +16,8 @@ export function GetMedikamente():Promise<Array<main.Medikament>>;
 
 export function GetWarnfrist():Promise<number>;
 
+export function Quit():Promise<void>;
+
 export function UpdateFerien(arg1:main.Ferien):Promise<main.Ferien>;
 
 export function UpdateMedikament(arg1:main.Medikament):Promise<main.Medikament>;

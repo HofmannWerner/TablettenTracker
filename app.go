@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 	_ "modernc.org/sqlite"
 )
 
@@ -20,6 +21,11 @@ type App struct {
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
+}
+
+// Quit terminates the Wails application
+func (a *App) Quit() {
+	runtime.Quit(a.ctx)
 }
 
 // startup is called when the app starts. The context is saved

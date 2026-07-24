@@ -30,6 +30,10 @@ export function GetWarnfrist() {
   return window['go']['main']['App']['GetWarnfrist']();
 }
 
+export function Quit() {
+  return window['go']['main']['App']['Quit']();
+}
+
 export function UpdateFerien(arg1) {
   return window['go']['main']['App']['UpdateFerien'](arg1);
 }
