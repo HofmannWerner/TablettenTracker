@@ -4,7 +4,7 @@
     <q-tabs
       v-model="activeTab"
       dense
-      class="text-primary bg-white shadow-2 rounded-borders q-mb-md"
+      :class="$q.dark.isActive ? 'bg-dark text-white shadow-2 rounded-borders q-mb-md' : 'bg-white text-primary shadow-2 rounded-borders q-mb-md'"
       align="left"
       active-color="primary"
       indicator-color="primary"
@@ -22,12 +22,11 @@
             v-model.number="warnfrist" 
             type="number" 
             :label="t('warnfristLabel')" 
-            standout="bg-primary text-white"
-            bg-color="grey-3"
-            label-color="black"
-            color="black"
+            outlined
             dense
-            style="max-width: 200px"
+            :bg-color="$q.dark.isActive ? 'grey-9' : 'white'"
+            color="primary"
+            style="max-width: 220px"
             @change="saveWarnfrist"
           >
             <template v-slot:prepend>
